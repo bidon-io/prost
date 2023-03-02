@@ -269,7 +269,7 @@ fn try_message(input: TokenStream) -> Result<TokenStream, Error> {
                 wire_type: ::prost::encoding::WireType,
                 buf: &mut ::prost::MergeBuffer,
                 ctx: ::prost::encoding::DecodeContext,
-            ) -> Result<(), ::prost::DecodeError>
+            ) -> ::core::result::Result<(), ::prost::DecodeError>
             {
                 ::prost::encoding::message::merge(wire_type, self, buf, ctx)
             }
@@ -281,7 +281,7 @@ fn try_message(input: TokenStream) -> Result<TokenStream, Error> {
                 wire_type: ::prost::encoding::WireType,
                 buf: &mut ::prost::MergeBuffer,
                 ctx: ::prost::encoding::DecodeContext,
-            ) -> Result<(), ::prost::DecodeError>
+            ) -> ::core::result::Result<(), ::prost::DecodeError>
             where
                 Self: Sized {
                 ::prost::encoding::message::merge_repeated(wire_type, vec, buf, ctx)

@@ -584,7 +584,7 @@ type RegistryKey = (ExtendableTypeId, FieldTag);
 ///
 /// Users should load the registry with the static Extensions from generated code via `register`
 /// before decoding a message.
-#[derive(Default)]
+#[derive(Default,Clone)]
 pub struct ExtensionRegistry {
     extensions: BTreeMap<RegistryKey, &'static dyn Extension>,
 }

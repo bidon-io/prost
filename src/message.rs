@@ -123,12 +123,13 @@ pub trait Message: Debug + Send + Sync {
     /// The entire buffer will be consumed.
     fn decode_with_extensions<B>(
         mut buf: B,
-        extension_registry: ExtensionRegistry,
+        extension_registry: &ExtensionRegistry,
     ) -> Result<Self, DecodeError>
     where
         B: Buf,
         Self: Default,
     {
+        let extension_registry = extension_registry.clone();
         let mut message = Self::default();
         Self::merge_with_extensions(&mut message, &mut buf, extension_registry).map(|_| message)
     }

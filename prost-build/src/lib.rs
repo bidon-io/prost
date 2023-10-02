@@ -141,6 +141,7 @@ use std::process::Command;
 use log::debug;
 use log::trace;
 
+use prost::ExtensionRegistry;
 use prost::Message;
 use prost_types::{FileDescriptorProto, FileDescriptorSet};
 
@@ -240,6 +241,7 @@ impl Default for BytesType {
 /// This configuration builder can be used to set non-default code generation options.
 pub struct Config {
     file_descriptor_set_path: Option<PathBuf>,
+    extension_registry: Option<ExtensionRegistry>,
     service_generator: Option<Box<dyn ServiceGenerator>>,
     map_type: PathMap<MapType>,
     bytes_type: PathMap<BytesType>,
@@ -578,6 +580,12 @@ impl Config {
         P: AsRef<str>,
     {
         self.boxed.insert(path.as_ref().to_string(), ());
+        self
+    }
+
+    /// Configure the code generator to use the provided extension_registry
+    pub fn extension_registry(&mut self, extension_registry: ExtensionRegistry) -> &mut Self {
+        self.extension_registry = Some(extension_registry);
         self
     }
 
@@ -1106,12 +1114,24 @@ impl Config {
                 ),
             )
         })?;
-        let file_descriptor_set = FileDescriptorSet::decode(&*buf).map_err(|error| {
-            Error::new(
-                ErrorKind::InvalidInput,
-                format!("invalid FileDescriptorSet: {}", error),
-            )
-        })?;
+
+        let file_descriptor_set =
+            if let Some(registry) = &self.extension_registry {
+                FileDescriptorSet::decode_with_extensions(&*buf,registry).map_err(|error| {
+                    Error::new(
+                        ErrorKind::InvalidInput,
+                        format!("invalid FileDescriptorSet: {}", error),
+                    )
+                })?
+            }
+            else {
+                FileDescriptorSet::decode(&*buf).map_err(|error| {
+                    Error::new(
+                        ErrorKind::InvalidInput,
+                        format!("invalid FileDescriptorSet: {}", error),
+                    )
+                })?
+            };
 
         self.compile_fds(file_descriptor_set)
     }
@@ -1244,6 +1264,7 @@ impl default::Default for Config {
     fn default() -> Config {
         Config {
             file_descriptor_set_path: None,
+            extension_registry: None,
             service_generator: None,
             map_type: PathMap::default(),
             bytes_type: PathMap::default(),
@@ -1272,6 +1293,7 @@ impl fmt::Debug for Config {
     fn fmt(&self, fmt: &mut fmt::Formatter<'_>) -> fmt::Result {
         fmt.debug_struct("Config")
             .field("file_descriptor_set_path", &self.file_descriptor_set_path)
+            .field("extension_registry", &self.extension_registry)
             .field("service_generator", &self.service_generator.is_some())
             .field("map_type", &self.map_type)
             .field("bytes_type", &self.bytes_type)

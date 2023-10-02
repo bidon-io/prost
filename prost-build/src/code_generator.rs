@@ -88,7 +88,7 @@ impl<'a> CodeGenerator<'a> {
             code_gen.path.pop();
         }
         code_gen.path.pop();
-        code_gen.append_registration(&file.extension, ExtensionContext::File);
+        //code_gen.append_registration(&file.extension, ExtensionContext::File);
 
         code_gen.path.push(4);
         for (idx, message) in file.message_type.into_iter().enumerate() {
@@ -1170,6 +1170,7 @@ fn defines_extensions(message: &DescriptorProto) -> bool {
     !message.extension.is_empty()
 }
 
+#[allow(dead_code)]
 enum ExtensionContext {
     File,
     Message,

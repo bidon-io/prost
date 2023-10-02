@@ -96,6 +96,22 @@ fn main() {
         .unwrap();
 
     config
+        .compile_protos(&[src.join("result_enum.proto")], includes)
+        .unwrap();
+
+    config
+        .compile_protos(&[src.join("result_struct.proto")], includes)
+        .unwrap();
+
+    config
+        .compile_protos(&[src.join("option_enum.proto")], includes)
+        .unwrap();
+
+    config
+        .compile_protos(&[src.join("option_struct.proto")], includes)
+        .unwrap();
+
+    config
         .compile_protos(&[src.join("extensions.proto")], includes)
         .unwrap();
 

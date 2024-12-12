@@ -518,7 +518,7 @@ where
 }
 
 /// A generic container for an Extension that can delegate to the implementation for type-specific work.
-pub trait Extension {
+pub trait Extension: Send + Sync {
     /// Fully-qualified type name of the message this extension is for.
     fn extendable_type_id(&self) -> ExtendableTypeId;
 
@@ -544,6 +544,7 @@ impl Debug for dyn Extension {
 }
 
 /// A concrete implementation of an Extension that tracks type information of the contained data.
+#[derive(Clone)]
 pub struct ExtensionImpl<T> {
     pub extendable_type_id: ExtendableTypeId,
     pub field_tag: FieldTag,
@@ -551,7 +552,7 @@ pub struct ExtensionImpl<T> {
 
     // Concrete impl tracks the value type T with phantom data, which can be used to
     // create the concrete ExtensionValueImpl type when requested.
-    pub _phantom: PhantomData<*const T>,
+    pub _phantom: PhantomData<T>,
 }
 
 impl<T> Extension for ExtensionImpl<T>
